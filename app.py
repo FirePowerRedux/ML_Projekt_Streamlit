@@ -44,8 +44,7 @@ def build_features_row(inp: dict) -> pd.DataFrame:
     Buduje jeden wiersz danych (DataFrame 1xN) w formacie oczekiwanym przez model
     Kluczowe jest, aby końcowy DF posiadał dokładnie kolumny FEATURES, czyli te same nazwy i kolejność
     """
-    if "Score rank" in FEATURES and "Score rank" not in row:
-    row["Score rank"] = np.nan
+
     #  Bazowe cechy bezpośrednio z inputów
     row = {
         "Price": inp["price"],
@@ -58,6 +57,9 @@ def build_features_row(inp: dict) -> pd.DataFrame:
         "Linux": int(inp["linux"]),
     }
 
+    if "Score rank" in FEATURES and "Score rank" not in row:
+        row["Score rank"] = np.nan
+    
     # Cecha pochodna "ile platform wspiera gra"
     row["platform_count"] = row["Windows"] + row["Mac"] + row["Linux"]
 
