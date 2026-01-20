@@ -150,4 +150,4 @@ if submitted:
     else:
         st.success("Wynik: **0 (brak sygnału ryzyka)**")
 
-    st.caption("Uwaga: model pomocniczy — traktuj jako filtr do ręcznej weryfikacji.")
+    st.caption("Uwaga, model ma jedynie forme pomocniczą. Powinien być traktowany jako filtr do dalszej, ręcznej weryfikacji")
