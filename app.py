@@ -12,14 +12,17 @@ st.set_page_config(page_title="Steam Risk Predictor")
 @st.cache_resource
 def load_artifact(path: str = "model.joblib"):
     """
-    Wczytuje zapisany artefakt z dysku, np. pipeline
+    Wczytuje zapisany plik z dysku, 
     cache_resource sprawia, że Streamlit nie wczytuje tego pliku przy każdej zmianie w UI
     """
     return joblib.load(path)
 
 artifact = load_artifact()
 model = artifact["model"]          # np. Pipeline( preprocessing i następnie classifier )
-FEATURES = list(artifact["features"])  # lista nazw kolumn w dokładnej kolejności dla modelu
+
+# branie dokładnie tych kolumn, na których model był fitowany 
+FEATURES = list(getattr(model, "feature_names_in_", artifact.get("features", [])))
+
 
 # Teksty na stronie
 st.title(" Predykcja ryzyka słabego odbioru gry (low_reception)")
@@ -41,6 +44,8 @@ def build_features_row(inp: dict) -> pd.DataFrame:
     Buduje jeden wiersz danych (DataFrame 1xN) w formacie oczekiwanym przez model
     Kluczowe jest, aby końcowy DF posiadał dokładnie kolumny FEATURES, czyli te same nazwy i kolejność
     """
+    if "Score rank" in FEATURES and "Score rank" not in row:
+    row["Score rank"] = np.nan
     #  Bazowe cechy bezpośrednio z inputów
     row = {
         "Price": inp["price"],
@@ -78,7 +83,7 @@ def build_features_row(inp: dict) -> pd.DataFrame:
     # Zwracanie DF z kolumnami w dokładnie tej samej kolejności, jakiej oczekuje model
     return pd.DataFrame([row], columns=FEATURES)
 
-# 3) UI (FORMULARZ), form sprawia, że predykcja włącza się dopiero po kliknięciu
+# 3) UI FORMULARZ, form sprawia, że predykcja włącza się dopiero po kliknięciu
 with st.form("game_inputs"):
     # Liczbowe parametry gry
     price = st.number_input("Cena (Price)", min_value=0.0, value=49.99, step=1.0)
